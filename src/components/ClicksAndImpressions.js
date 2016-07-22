@@ -68,11 +68,11 @@ var ClicksAndImpressions = React.createClass({
 	getOptions (input) {
 		return axios.get('http://mockbin.org/bin/3f1037be-88f3-4e34-a8ec-d602779bf2d6').then((response) => {
 			return this.csvToJson(response.data);
-		})
-      .then((json) => {
-      	//console.log(json)
-        return { options: json.items };
-      });
+	})
+	.then((json) => {
+	//console.log(json)
+		return { options: json.items };
+	});
 	},
 
 	render () {
