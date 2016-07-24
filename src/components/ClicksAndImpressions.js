@@ -1,9 +1,11 @@
 import React from 'react';
 import Select from 'react-select';
+import {pickBy, startsWith, reduce, tail, zipObject, concat, map } from 'lodash';
+import NumberWithLabel from './NumberWithLabel';
 
 var axios = require('axios');
 
-var _ = require('lodash');
+//var _ = require('lodash');
 
 var ClicksAndImpressions = React.createClass({
 	displayName: 'ClicksAndImpressions',
@@ -12,7 +14,7 @@ var ClicksAndImpressions = React.createClass({
 	},
 	getInitialState () {
 		return {
-			value: "",
+			value: '',
 			sumClicks: 0,
 			sumImpressions: 0,
 			options: [],
@@ -30,13 +32,13 @@ var ClicksAndImpressions = React.createClass({
 		//console.log(JSON.stringify(result));
 
 		var sumClicks = _.reduce(result, function(sum, n){
-		  return sum + parseFloat(n.clicks);
+		  return sum + parseInt(n.clicks);
 		}, 0);
 
 		//console.log(sumClicks);
 
 		var sumImpressions = _.reduce(result, function(sum, n){
-		  return sum + parseFloat(n.impressions);
+		  return sum + parseInt(n.impressions);
 		}, 0);
 
 		//console.log(sumImpressions);
@@ -68,26 +70,35 @@ var ClicksAndImpressions = React.createClass({
 	getOptions (input) {
 		return axios.get('http://mockbin.org/bin/3f1037be-88f3-4e34-a8ec-d602779bf2d6').then((response) => {
 			return this.csvToJson(response.data);
-	})
-	.then((json) => {
-	//console.log(json)
+			})
+		.then((json) => {
+		//console.log(json)
 		return { options: json.items };
-	});
+		});
 	},
 
 	render () {
+		var selectDivStyle = {
+			display: 'inline-block',
+			width: '300px'
+		}
 		return (
-			
 			<div className="section">
-				<h3 className="section-heading">{this.props.label}</h3>
-				<Select.Async
-					onChange={this.onChange}
-					simpleValue
-					minimumInput={1}
-					value={this.state.value}
-					loadOptions={this.getOptions}
-				/>
-				<div>Clicks: {this.state.sumClicks} Impressions: {this.state.sumImpressions}</div>
+				<h4 className="section-heading">{this.props.label}</h4>
+				<div style={selectDivStyle}>
+					<Select.Async
+						onChange={this.onChange}
+						simpleValue
+						minimumInput={1}
+						value={this.state.value}
+						loadOptions={this.getOptions}
+						placeholder=''
+					/>
+				</div>
+				<p>
+					<NumberWithLabel labelText='Clicks:' numberCount={this.state.sumClicks}/>
+					<NumberWithLabel labelText='Impressions:' numberCount={this.state.sumImpressions} />
+				</p>
 			</div>
 		);
 	}
