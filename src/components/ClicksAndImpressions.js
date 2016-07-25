@@ -1,81 +1,80 @@
-import React from 'react';
+import React, { Component, PropTypes } from 'react';
 import Select from 'react-select';
-import {pickBy, startsWith, reduce, tail, zipObject, concat, map } from 'lodash';
+import { pickBy, startsWith, reduce, tail, zipObject, concat, map } from 'lodash';
 import NumberWithLabel from './NumberWithLabel';
 
 var axios = require('axios');
 
-//var _ = require('lodash');
+//var ClicksAndImpressions = React.createClass({
+export default class ClicksAndImpressions extends Component { 
+	
+	staticpropTypes: {
+		label: PropTypes.string
+	}
 
-var ClicksAndImpressions = React.createClass({
-	displayName: 'ClicksAndImpressions',
-	propTypes: {
-		label: React.PropTypes.string
-	},
-	getInitialState () {
-		return {
-			value: '',
-			sumClicks: 0,
-			sumImpressions: 0,
-			options: [],
-			adwordData: {}
-		}
-	},
+	state = {
+		value: '',
+		sumClicks: 0,
+		sumImpressions: 0,
+		options: [],
+		adwordData: {}
+	}
 
-	onChange(value) {
+	onChange = (value) => {
 		console.log('New Value', value);
 
-		var result = _.pickBy(this.state.adwordData, function(v, k) {
-		  return _.startsWith(v.campaign, value) || _.startsWith(v.channel, value);
+		var result = pickBy(this.state.adwordData, function(v, k) {
+		  return startsWith(v.campaign, value) || startsWith(v.channel, value);
 		});
 
 		//console.log(JSON.stringify(result));
 
-		var sumClicks = _.reduce(result, function(sum, n){
-		  return sum + parseInt(n.clicks);
+		var sumClicks = reduce(result, (sum, n) => {
+		  return sum + parseInt(n.clicks, 10);
 		}, 0);
 
 		//console.log(sumClicks);
 
-		var sumImpressions = _.reduce(result, function(sum, n){
-		  return sum + parseInt(n.impressions);
+		var sumImpressions = reduce(result, (sum, n) => {
+		  return sum + parseInt(n.impressions, 10);
 		}, 0);
 
 		//console.log(sumImpressions);
 
-		this.setState({value: value, sumClicks: sumClicks, sumImpressions: sumImpressions});
+		this.setState({ value, sumClicks, sumImpressions });
+	}
 
-	},
-	csvToJson(csv) {
+	csvToJson = (csv) => {
 		const content = csv.trim().split('\n');
-		//console.log(content)
+
 		const header = content[0].split(',');
-		var jsonData = _.tail(content).map((row) => {
-			var data = _.zipObject(header, row.split(','));
-			return data;
+		var jsonData = tail(content).map(row => {
+			var data = zipObject(header, row.split(','));
+			return data
 		});
 
-		this.setState({adwordData : jsonData});
+		this.setState({ adwordData: jsonData });
 
 		var uniques = _.concat(...new Set(jsonData.map(item => item.campaign)), ...new Set(jsonData.map(item => item.channel)));
 
 		//console.log(JSON.stringify(uniques));
 
-		const options = _.map(uniques, function(value, key) {
+		const options = uniques.map((value, key) => {
 			return { value: value, label: value };
 		});
 
 		return {items: options};
-	},
-	getOptions (input) {
+	}
+
+	getOptions = (input) => {
 		return axios.get('http://mockbin.org/bin/3f1037be-88f3-4e34-a8ec-d602779bf2d6').then((response) => {
 			return this.csvToJson(response.data);
 			})
 		.then((json) => {
-		//console.log(json)
-		return { options: json.items };
+			//console.log(json)
+			return { options: json.items };
 		});
-	},
+	}
 
 	render () {
 		var selectDivStyle = {
@@ -100,8 +99,6 @@ var ClicksAndImpressions = React.createClass({
 					<NumberWithLabel labelText='Impressions:' numberCount={this.state.sumImpressions} />
 				</p>
 			</div>
-		);
+		)
 	}
-});
-
-module.exports = ClicksAndImpressions;
+}
