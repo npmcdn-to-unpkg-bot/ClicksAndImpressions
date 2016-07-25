@@ -1,11 +1,10 @@
-import React, { Component, PropTypes } from 'react';
-import Select from 'react-select';
-import { pickBy, startsWith, reduce, tail, zipObject, concat, map } from 'lodash';
-import NumberWithLabel from './NumberWithLabel';
+import React, { Component, PropTypes } from 'react'
+import Select from 'react-select'
+import { pickBy, startsWith, reduce, tail, zipObject, concat, map } from 'lodash'
+import NumberWithLabel from './NumberWithLabel'
 
-var axios = require('axios');
+const axios = require('axios')
 
-//var ClicksAndImpressions = React.createClass({
 export default class ClicksAndImpressions extends Component { 
 	
 	staticpropTypes: {
@@ -55,7 +54,7 @@ export default class ClicksAndImpressions extends Component {
 
 		this.setState({ adwordData: jsonData });
 
-		var uniques = _.concat(...new Set(jsonData.map(item => item.campaign)), ...new Set(jsonData.map(item => item.channel)));
+		var uniques = concat(...new Set(jsonData.map(item => item.campaign)), ...new Set(jsonData.map(item => item.channel)));
 
 		//console.log(JSON.stringify(uniques));
 
@@ -77,7 +76,7 @@ export default class ClicksAndImpressions extends Component {
 	}
 
 	render () {
-		var selectDivStyle = {
+		const selectDivStyle = {
 			display: 'inline-block',
 			width: '300px'
 		}
